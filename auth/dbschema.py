@@ -27,13 +27,29 @@ class User(SQLModel, table=True):
     phone_number: str | None = None
 
     # Flag indicating if the user is active
-    is_active: bool = False
+    is_active: bool = Field(default=False)
 
     # Flag indicating if the user is disabled
-    is_disabled: bool = False
+    is_disabled: bool = Field(default=False)
 
     # Time when the user was created
     created_at: datetime = Field(default_factory=None, nullable=False)
 
     # Time when the user was last updated
     updated_at: datetime = Field(default_factory=None, nullable=False)
+
+
+
+class BlacklistedTokens(SQLModel, table=True):
+    """
+    SQL Model representing a blacklisted token.
+    """
+
+    # UUID primary key
+    id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
+
+    # Token
+    token: str
+
+    # Time when the token was blacklisted
+    created_at: datetime = Field(default_factory=datetime.now, nullable=False)
