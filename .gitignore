@@ -1,0 +1,5 @@
+__pycache__
+.env
+Data/Eat_Right.sqlite
+data-log/
+test_email.py
