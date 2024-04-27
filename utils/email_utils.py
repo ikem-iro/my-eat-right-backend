@@ -116,7 +116,7 @@ def send_mail(email_to: str, subject: str, html_content: str):
                     server.send_message(msg)
             case _:
                 return {"error": "use 465 / 587 as port value"}
-        return {"success": "successfully sent"}
+        return {"success": "Email successfully sent"}
     except Exception as e:
         return {"error": e}
 

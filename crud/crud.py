@@ -1,5 +1,4 @@
 from sqlmodel import Session, select
-from fastapi.encoders import jsonable_encoder
 from auth.dbschema import User, BlacklistedTokens
 
 
