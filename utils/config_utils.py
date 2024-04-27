@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "Eat  Right"
     FRONTEND_URL: str = "http://localhost:3000/api/v1/"
+
     # 
     ACCESS_TOKEN_EXPIRES: int = 60 * 60 * 24 * 3
     ACCESS_TOKEN_SECRET_KEY: str
@@ -17,6 +18,11 @@ class Settings(BaseSettings):
     PASSWORD_RESET_TOKEN_SECRET_KEY: str
     VERIFY_EMAIL_TOKEN_EXPIRES: int = 60 * 60 * 24 
     VERIFY_EMAIL_TOKEN_SECRET_KEY: str
+
+    ORIGINS: list[str]
+    ALLOWED_METHODS: list[str] = ["*"]
+    ALLOW_HEADERS: list[str] = ["*"]
+
     # 
     EMAILS_FROM_NAME: str = "Eat Right"
     EMAILS_FROM_MAIL: str 

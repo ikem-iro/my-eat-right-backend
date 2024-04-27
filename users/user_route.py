@@ -2,7 +2,6 @@ from .models import Prompt
 from fastapi import APIRouter, Response, Depends
 from dependencies.db import get_session
 from dependencies.user_deps import get_current_user
-from auth.dbschema import User
 from sqlmodel import Session
 from typing import Annotated
 from .controller import process_user_prompt, get_auth_user
