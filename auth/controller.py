@@ -170,7 +170,7 @@ def passwd_reset(new_password, session, token):
         return {"error": str(e)}
 
 
-def send_verification_email(id, session):
+def send_verification_email(token_data, id, session):
     """
     Sends a verification email to the user with the given ID.
 
@@ -186,6 +186,10 @@ def send_verification_email(id, session):
         ValueError: If the user does not exist or the user is already active.
     """
     try:
+        if token_data is None:
+            raise ValueError("Unauthorized User")
+        if token_data != id:
+            raise ValueError("Unauthorized User")
         format_id_to_uuid = str(uuid.UUID(id))
         print(format_id_to_uuid)
         user_exists = get_user_by_id(format_id_to_uuid, session)
