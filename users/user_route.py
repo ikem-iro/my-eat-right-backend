@@ -1,4 +1,4 @@
-from .models import Prompt
+from .models import Prompt, UpdateUser
 from fastapi import APIRouter, Response, Depends
 from dependencies.db import get_session
 from dependencies.user_deps import get_current_user
@@ -116,10 +116,37 @@ async def user_chat_history(
 
 @router.put("/me/profile")
 async def update_user_profile(
-
+    update_user: UpdateUser,
     token_data: Annotated[str, Depends(get_current_user)],
     session: Annotated[Session, Depends(get_session)],
     res: Response,
 ):
-    response = modify_user_profile(token_data, session)
-    pass
+    """
+    Updates the user profile with the provided data.
+
+    Args:
+        update_user (UpdateUser): The data to update the user profile.
+        token_data (Annotated[str, Depends(get_current_user)]): The token data for user authentication.
+        session (Annotated[Session, Depends(get_session)]): The current database session.
+        res (Response): The response object to send the HTTP response.
+
+    Returns:
+        The result of the profile update operation as a dictionary.
+        If successful, the dictionary will have a "message" key.
+        If there is an error, the dictionary will have an "error" key with the error message.
+    """
+    response = modify_user_profile(token_data, update_user, session)
+    match response.get("error"):
+        case "Invalid token.":
+            res.status_code = 401
+            return response
+        case "Unauthorized user.":
+            res.status_code = 403
+            return response
+        case "Username must be unique":
+            res.status_code = 400
+            return response 
+        case _:
+            res.status_code = 200
+            return response
+

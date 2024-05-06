@@ -5,6 +5,7 @@ from .dbschema import User, BlacklistedTokens
 from fastapi.encoders import jsonable_encoder
 from crud.crud import get_user_by_email, get_user_by_id, get_blacklisted_token
 from utils.pass_utils import hash_password, compare_password_and_hash
+from utils.user_utils import generate_username
 from utils.token_utils import (
     create_access_token,
     create_password_reset_token,
@@ -41,6 +42,7 @@ def create_new_user(user, session):
             raise ValueError("User already exists.")
         user.password = hash_password(user.password)
         new_user = User(**user.dict())
+        new_user.username = generate_username(new_user.first_name, new_user.last_name)
         new_user.created_at = datetime.now()
         new_user.updated_at = datetime.now()
         token = create_verify_email_token(new_user.email)

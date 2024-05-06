@@ -35,6 +35,21 @@ def get_user_by_id(id, session: Session):
     result = session.exec(statement).first()
     return result
 
+def get_user_by_username(username: str, session: Session):
+    """
+    Retrieve a user by their username from the database.
+
+    Args:
+        username (str): The username of the user to retrieve.
+        session (Session): The database session to execute the query.
+
+    Returns:
+        User: The user object retrieved based on the username.
+    """
+    statement = select(User).where(User.username == username)
+    result = session.exec(statement).first()
+    return result
+
 def get_blacklisted_token(token: str, session: Session):
     statement = select(BlacklistedTokens).where(BlacklistedTokens.token == token)
     result = session.exec(statement).first()

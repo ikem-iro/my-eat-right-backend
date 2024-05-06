@@ -1,8 +1,9 @@
 import openai
 from utils.config_utils import settings
-from crud.crud import get_user_by_id, get_chat_history
+from crud.crud import get_user_by_id, get_chat_history, get_user_by_username
 from fastapi.encoders import jsonable_encoder
 from .dbschema import Chats
+from datetime import datetime
 
 
 def process_user_prompt(prompt, token_data, session):
@@ -89,6 +90,7 @@ def get_auth_user(token_data, session):
             "id": auth_user.id,
             "first_name": auth_user.first_name,
             "last_name": auth_user.last_name,
+            "username": auth_user.username,
             "phone_number": auth_user.phone_number,
             "email": auth_user.email,
             "is_active": auth_user.is_active,
@@ -129,5 +131,43 @@ def get_auth_user_chat_history(token_data, session):
 
 
 
-def modify_user_profile(token_data, session):
-    pass
+def modify_user_profile(token_data, update_user, session):
+    """
+    Modifies the user profile with the provided update data.
+
+    Args:
+        token_data (str): The token data containing user information.
+        update_user: The updated user data.
+        session (Session): The database session.
+
+    Returns:
+        dict: A dictionary containing the result of the profile update operation.
+            If the profile is updated successfully, the dictionary will have a "message" key.
+            If there is an error, the dictionary will have an "error" key with the error message.
+    """
+    try:
+        if token_data is None:
+            raise ValueError("Invalid token.")
+        user = get_user_by_id(token_data, session)
+        if user is None:
+            raise ValueError("Unauthorized user.")
+        auth_user = user
+        if update_user.first_name is not None and update_user.first_name != "":
+            auth_user.first_name = update_user.first_name
+        if update_user.last_name is not None and update_user.last_name != "":
+            auth_user.last_name = update_user.last_name
+        if update_user.username is not None and update_user.username != "":
+            is_username_unique = get_user_by_username(update_user.username, session)
+            if is_username_unique is not None:
+                raise ValueError("Username must be unique")
+            auth_user.username = update_user.username
+        if update_user.phone_number is not None and update_user.phone_number != "":
+            update_user.phone_number = update_user.phone_number.split(":")[-1]
+            auth_user.phone_number = update_user.phone_number
+        auth_user.updated_at = datetime.now()
+        session.add(auth_user)
+        session.commit()
+        session.refresh(auth_user)
+        return {"message": "Profile updated successfully."}
+    except ValueError as e:
+        return {"error": str(e)}

@@ -17,6 +17,9 @@ class User(SQLModel, table=True):
     # User's last name
     last_name: str
 
+    # User's username
+    username: str = Field(unique=True, index=True)
+
     # User's email
     email: str = Field(unique=True, index=True)
 
