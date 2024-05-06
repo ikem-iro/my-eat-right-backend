@@ -2,6 +2,7 @@ from fastapi import APIRouter, Response, Depends, Path
 from sqlmodel import Session
 from typing import Annotated
 from dependencies.db import get_session
+from dependencies.user_deps import get_current_user
 from dependencies.user_deps import oauth2_scheme
 from .models import RegisterUser, LoginUser, NewPassword
 from .controller import create_new_user, log_user_in, password_recovery, passwd_reset, verify_user_email, send_verification_email, log_user_out
@@ -134,7 +135,7 @@ async def reset_password(new_password: NewPassword, session: Annotated[Session, 
 
 
 @router.post('/verify-email/{id}')
-async def verify_email(session: Annotated[Session, Depends(get_session)], res: Response, id: str = Path(title="User ID")):
+async def verify_email(token_data: Annotated[str, Depends(get_current_user)],session: Annotated[Session, Depends(get_session)], res: Response, id: str = Path(title="User ID")):
     """
     Verify the email for a user.
 
@@ -147,7 +148,7 @@ async def verify_email(session: Annotated[Session, Depends(get_session)], res: R
         - If the email verification is successful, returns a dictionary with the response.
         - If there is an error during email verification, returns a dictionary with an 'error' key.
     """
-    response = send_verification_email(id, session)
+    response = send_verification_email(token_data, id, session)
     if "error" in response:
         res.status_code = 400
         return response
